@@ -1,0 +1,14 @@
+name: "."
+title: "Meghan Fletcher"
+description: |
+  Meghan Fletcher
+output_dir: "docs"
+navbar:
+  right:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+    - text: "About me!"
+      href: meghan.html
+output: distill::distill_article
