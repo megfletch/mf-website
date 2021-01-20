@@ -15,5 +15,8 @@ output:
 site: distill::distill_website
 ---
  
-First-year master's student at the Bren School of Environmental Science & Management. Focusing on Conservation Planning and Strategic Environmental Science Communication.
- 
+First-year master's student at the Bren School of Environmental Science
+& Management. Focusing on Conservation Planning and Strategic Environmental 
+Science Communication. 
+
+
