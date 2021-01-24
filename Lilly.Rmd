@@ -14,4 +14,4 @@ output:
   postcards::jolla
 ---
  
-I'm a 1.5 year old golden retriever living my best life in sunny Santa Barbara. My hobbies include eating sticks, swimming and messing with myborther, Bennie and Zoom.
+I'm a 1.5 year old golden retriever living my best life in sunny Santa Barbara. My hobbies include eating sticks, swimming and messing with my brothers, Bennie and Zoom.
