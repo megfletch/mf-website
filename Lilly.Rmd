@@ -1,0 +1,17 @@
+---
+title: "Lilly Bean"
+image: "lilly.jpg"
+links:
+  - label: LinkedIn
+    url: "https://linkedin.com/"
+  - label: Twitter
+    url: "https://twitter.com/"
+  - label: GitHub
+    url: "https://github.com/"
+  - label: Email
+    url: "mailto:email@email.com"
+output:
+  postcards::jolla
+---
+ 
+I'm a 1.5 year old golden retriever living my best life in sunny Santa Barbara. My hobbies include eating sticks, swimming and messing with myborther, Bennie and Zoom.

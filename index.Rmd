@@ -3,13 +3,13 @@ title: "Meghan Fletcher"
 image: "meghan.jpg"
 links:
   - label: LinkedIn
-    url: "https://linkedin.com/"
+    url: "https://www.linkedin.com/in/meghan-fletcher-187069171/"
   - label: Twitter
     url: "https://twitter.com/"
   - label: GitHub
-    url: "https://github.com/"
+    url: "https://github.com/megfletch"
   - label: Email
-    url: "mailto:email@email.com"
+    url: "mailto:mjfletcher@ucsb.edu"
 output:
   postcards::jolla
 site: distill::distill_website
