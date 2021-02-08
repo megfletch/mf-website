@@ -1,7 +1,7 @@
 ---
-title: "welcome"
+title: "Welcome!"
 description: |
-  A short description of the post.
+  This is my first blog post.
 author:
   - name: Unknown
 date: 02-08-2021
@@ -9,6 +9,8 @@ output:
   distill::distill_article:
     self_contained: false
 ---
+
+
 
 
 ```{r setup, include=FALSE}
