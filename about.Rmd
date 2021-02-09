@@ -16,7 +16,7 @@ library(here)
 Meghan Fletcher was born and raised in Pleasanton, California. She has always been passionate about animals and conservation and has continued to follow her passion and is now getting her masters degree from the Bren School of Environmental Science & Management and will be focusing on Conservation planning and Strategic Environmental Communication. 
 
 
-Before Bren, Meghan earned her bachelors degree from UC San Diego. There, she majored in Ecology, Behavior and Evolution and minored in Marine Science. She was also an NCAA track & field scholar-athlete for the Tritons. She ran the 100 and 400 meter hurdles as well as the 4x100 and 4x400 meters relays. Meghan was nominated as a captain her junior year and was lead captain her senior year. She holds three All-Conference title and was a national qualifier in the 400 meter hurdles in 2018 and competed in the 2018 Division II National Track & Field Championships. 
+Before Bren, Meghan earned her bachelors degree from UC San Diego. There, she majored in Ecology, Behavior and Evolution and minored in Marine Science. She was also an NCAA track & field scholar-athlete for the Tritons. She competed in the 100 and 400 meter hurdles as well as the 4x100 and 4x400 meters relays. Meghan was nominated as a captain her junior year and was lead captain her senior year. She holds three All-Conference title and was a national qualifier in the 400 meter hurdles in 2018 and competed in the 2018 Division II National Track & Field Championships. 
 
 ![Meghan with her 4x400 meter relay team after a big victory at the 2018 CCAA Conference Championships](images/track.jpg)
 
