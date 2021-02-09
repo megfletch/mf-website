@@ -3,6 +3,7 @@ title: "Meghan Fletcher"
 description: |
   Meghan Fletcher
 output_dir: "docs"
+theme: iyo.css
 navbar:
   right:
     - text: "Home"

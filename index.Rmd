@@ -11,7 +11,7 @@ links:
   - label: Email
     url: "mailto:mjfletcher@ucsb.edu"
 output:
-  postcards::jolla
+  postcards::trestles
 site: distill::distill_website
 ---
  
