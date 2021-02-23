@@ -1,0 +1,116 @@
+---
+title: "2008 California Oil Spill Incident Report"
+description: |
+  A short description of the post.
+author:
+  - name: Meghan Fletcher
+    url: {}
+date: 02-22-2021
+output:
+  distill::distill_article:
+    self_contained: false
+    html_document:
+      code_folding: hide
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(janitor)
+library(sf)
+library(tmap)
+library(gstat)
+library(stars)
+```
+
+#### **Overview:** The maps within this report reveal the number of oilspill incident across California in 2008. Oil spill data was utilized from CA DFW Oil Spill Incident Tracking created by the California State Geoportal: https://map.dfg.ca.gov/metadata/ds0394.html
+
+
+```{r}
+# Read in the oil spill data and CA shapefiles
+ca_oil <- read_sf(here("data", "ds394"), layer = "ds394") %>% 
+  clean_names()
+
+# st_crs(ca_oil)
+
+ca_counties <- read_sf(here("data", "ca_counties"), layer = "CA_Counties_TIGER2016") %>% 
+  clean_names() %>% 
+  select(name)
+
+# st_crs(ca_counties)
+```
+
+```{r, include = FALSE}
+# Make sure the coordinates of the data sets match
+ca_coutnies <- st_transform(ca_counties, st_crs(ca_oil))
+st_crs(ca_counties)
+```
+
+```{r}
+# Make exploratoy map to show where the CA oil spills have been
+ggplot() +
+  geom_sf(data = ca_counties, fill = "wheat") +
+  geom_sf(data = ca_oil, 
+          color = "deepskyblue4",
+          alpha = 0.3,
+          size = 1.2) +
+  theme_minimal() +
+  labs(x = "Latitude",y = "Longitude", title = "Oil Spill Incidents in California")
+```
+
+**Figure 1:** Each point on this map of California represents a specific oil spill incident from 2008 (Data: CA DFW Oil Spill Incident Tracking, 2008)."
+
+```{r}
+tmap_mode("view")
+
+tm_shape(ca_oil) +
+  tm_dots(aes(color = "cyan4"))
+```
+
+**Figure 2:** This interactive map allows viewers to zoom in on specific regions of California to more precisely see where these oil spill incidents occured in 2008 (CA DFW Oil Spill Incident Tracking, 2008).
+
+```{r, echo = FALSE}
+# Make new subset
+ca_oil_subset <- ca_oil %>% 
+  select(localecoun, geometry) %>% 
+  rename(name = localecoun)
+```
+
+```{r, include = FALSE}
+# Make sure coordinates match again
+# ca_oil_subset %>% st_crs()
+# ca_counties %>% st_crs()
+
+ca_counties <- st_transform(ca_counties, st_crs(ca_oil_subset))
+st_crs(ca_counties)
+```
+
+```{r}
+# Join together
+ca_oil_inland <- ca_counties %>% 
+  st_join(ca_oil_subset)
+
+# Get counts of inland oil spill events
+oil_counts <- ca_oil_inland %>% 
+  count(name.x)
+```
+
+```{r}
+
+# Make a chloropleth map in ggplot
+# fill color depends on count of inland oil spill events by county
+ggplot(data = oil_counts) +
+  geom_sf(aes(fill = n), color = "black", size = 0.1) +
+  scale_fill_gradientn(colors = c("lightsteelblue", "royalblue", "navy")) +
+  theme_minimal() +
+  labs(x = "Latitude", y = "Longitude", title = "Chloropleth Map of Oil Spill Incidents in 2008", fill = "Oil Spill Incidents") 
+```
+
+**Figure 3:** The chloropleth map of California reveals which counties had the most oil spill incidents in 2008. The darkest counties are those that experienced the greatest number of incidents and the lightest are those that experienced the least (Data: CA DFW Oil Spill Incident Tracking, 2008).
+
+
+
+
