@@ -1,0 +1,115 @@
+---
+title: "Global Wild Fish Catch Report (1950-2012)"
+description: |
+  A look into the logisitc growth of wild fish catch over time
+author:
+  - name: Meghan Fletcher
+    url: {}
+date: 03-07-2021
+output:
+  distill::distill_article:
+    self_contained: false
+    code_folding: hide
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+library(tidyverse)
+library(here)
+library(janitor)
+library(broom)
+```
+
+**Overview:** Using data collected by the Earth Policy Institute with 1950-2010 data from the U.N. Food and Agriculture Organization (FAO), this report demonstrates the logistic growth of wild fish caught globally from 1950 to 2012. To better determine the parameter estimates for the logistic growth model, a nonlinear least squares analysis was used.
+
+```{r}
+# Read in the data:
+fish_data <- read_csv(here("data", "fish_catch.csv")) %>% 
+  clean_names() %>% 
+  rename(year = world_wild_fish_catch_and_farmed_fish_production_1950_2012,
+         wild_catch = x2,
+         farmed_fish = x3,
+         total_fish = x4) %>% 
+  slice(-(1:4)) %>% 
+  slice(-(64:67)) %>% 
+  mutate(year = as.numeric(0:62)) %>% # To convert 1950-2012 to 0-62 years
+  mutate(wild_catch = as.numeric(wild_catch))
+```
+
+```{r}
+# Create an exploratory graph of wild fish catch over time
+ggplot(data = fish_data, aes(x = year, y = wild_catch)) +
+  geom_point(size = 2.5, alpha = 0.8, color = "orange") +
+  geom_line(color = "red", size = 0.77) +
+  theme_bw() +
+  scale_x_continuous(expand = c(0,0)) +
+  labs(x = "Year (From 1950 - 2012)", y = "Wild Fish Caught (Million Tons)", title = "Exploratory Wild Caught Fish Graph")
+```
+
+The trend of the original data appears to follow a logistic growth pattern. The logistic growth equation is represented by: $P(t)=\frac{K}{1+Ae^{-kt}}$, where
+
+- $K$ is the carrying capacity
+- $A$ is $\frac{K-P_0}{P_0}$
+- $k$ is the growth rate constant
+
+The initial estimates for the model's parameters are:
+
+- $K$ is about 94
+- $A$ is $\frac{94-17.2}{17.2}$ = 4.47
+- $k$ is 0.025
+
+```{r, include = FALSE, echo = FALSE}
+# Estimate the growth constant during exponential phase (to get a starting-point guess for *k*):
+
+# wild_fish_exp <- fish_data %>% 
+#   mutate(ln_wild_catch = log(wild_catch))
+
+# Use the linear model to get *k* estimate:
+
+# wild_fish_lm_k <- lm(ln_wild_catch ~ year, data = wild_fish_exp)
+# wild_fish_lm_k
+```
+
+```{r}
+# Use nonlinear least squares to fin the model parameters now:
+wild_fish_nls <- nls(wild_catch ~ K/(1 + A*exp(-r*year)),
+                     data = fish_data,
+                     start = list(K = 94, A = 4.47, r = 0.025))
+
+# Model summary:
+# summary(wild_fish_nls)
+
+# Tidy the model
+# wild_fish_nls_tidy <- broom::tidy(wild_fish_nls)
+```
+
+After using nonlinear least squares, the parameter estimates are:
+$$P(t) = \frac{100.29}{1+4.32e^{-0.07t}}$$
+
+- $P$ refers to the amount of wild caught fish in million tons
+- $t$ is the time in years from 1950 (year 0) to 2012 (year 62)
+
+```{r}
+# Make finalized graph of original and model outputs
+# Make predictions for wild fish caught from 1950-2012 (original model)
+fish_predict <- predict(wild_fish_nls)
+
+# Bind predictions to original data frame:
+fish_complete <- data.frame(fish_data, fish_predict)
+
+# Plot
+ggplot(data = fish_complete, aes(x = year, y = wild_catch)) +
+  geom_point(size = 2, alpha = 0.7, color = "skyblue") +
+  geom_line(color = "cyan4", size = 1, aes(x = year, y = fish_predict)) +
+  theme_bw() +
+  labs(x = "Year (From 1950 - 2012)", y = "Wild Fish Caught (Million Tons)", title = "Finalized Graph: Wild Fish Caught Globally from 1950 to 2012", subtitle = "Data: Earth Policy Institute") +
+  scale_x_continuous(expand = c(0,0), breaks = c(0, 10, 20, 30, 40, 50, 60))
+```
+
+
+**Data citation:** Global wild fish catch and aquaculture production, compiled by Earth Policy Institute with 1950-2010 from U.N. Food and Agriculture Organization (FAO), Global Capture Production and Global Aquaculture Production, electronic databases, at www.fao.org/fishery/topic/16140/en.
+
+
+

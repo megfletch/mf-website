@@ -9,8 +9,7 @@ date: 02-22-2021
 output:
   distill::distill_article:
     self_contained: false
-    html_document:
-      code_folding: hide
+    code_folding: hide
 ---
 
 
@@ -66,6 +65,7 @@ ggplot() +
 ```{r}
 tmap_mode("view")
 
+tm_basemap("Esri.WorldTopoMap") +
 tm_shape(ca_oil) +
   tm_dots(aes(color = "cyan4"))
 ```
