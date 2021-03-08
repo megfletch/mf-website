@@ -1,0 +1,177 @@
+---
+title: "Harry Potter Text Analysis"
+description: |
+  Text mining and analysis of Harry Potter and the Sorcerer's Stone by J.K. Rowling
+author:
+  - name: Meghan Fletcher
+    url: {}
+date: 03-07-2021
+output:
+  distill::distill_article:
+    self_contained: false
+    code_folding: hide
+---
+
+
+
+```{r setup, include=FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+library(tidyverse)
+library(here)
+library(tidytext)
+library(textdata)
+library(pdftools)
+library(ggwordcloud)
+```
+
+**Overview:** In this report, I performed a text and sentiment analysis on the book *Harry Potter and the Sorcerer's Stone* by J.K. Rowling. All copyrights belong to author J.K. Rowling. The PDF was sourced from: http://www.getfreestories.weebly.com/uploads/7/9/0/2/79020522/harry_potter_and_the_sorcerers_-_j.k._rowling.pdf
+
+
+```{r}
+# Read in Harry Potter and the Sorcerer's Stone
+hp_text <- pdf_text(here("data", "harry_potter_and_the_sorcerers_JKrowling.pdf"))
+```
+
+## Part 1: Text Analysis
+```{r}
+# Make the text tidy
+hp_tidy <- data.frame(hp_text) %>% 
+  mutate(text_full = str_split(hp_text, pattern ="\\n")) %>% 
+  unnest(text_full) %>% 
+  mutate(text_full = str_trim(text_full))
+```
+
+```{r}
+# Make it even tidier!
+hp_df <- hp_tidy %>% 
+  slice(-(1:44)) %>% 
+    mutate(chapter = case_when(
+    str_detect(text_full, pattern = "CHAPTER") ~ text_full,
+    TRUE ~ NA_character_
+  )) %>% 
+  fill(chapter) %>% 
+  separate(col = chapter, into = c("ch", "no"), sep = " ") %>% 
+  mutate(chapter = case_when(
+    no == "ONE" ~ 1,
+    no == "TWO" ~ 2,
+    no == "THREE" ~ 3,
+    no == "FOUR" ~ 4,
+    no == "FIVE" ~ 5,
+    no == "SIX" ~ 6,
+    no == "SEVEN"~ 7,
+    no == "EIGHT" ~ 8,
+    no == "NINE" ~ 9,
+    no == "TEN" ~ 10,
+    no == "ELEVEN" ~ 11,
+    no == "TWELVE" ~ 12,
+    no == "THIRTEEN" ~ 13,
+    no == "FOURTEEN" ~ 14,
+    no == "FIFTEEN" ~ 15,
+    no == "SIXTEEN" ~ 16,
+    no == "SEVENTEEN" ~ 17
+  )) %>% 
+  mutate(chapter = as.numeric(chapter))
+```
+
+```{r}
+# Get tokens of the text
+hp_tokens <- hp_df %>% 
+  unnest_tokens(word, text_full) %>% 
+  dplyr::select(-hp_text) 
+
+# Get word counts
+hp_wordcount <- hp_tokens %>% 
+  count(chapter, word)
+```
+
+```{r}
+# Remove all stop words
+hp_nonstop_words <- hp_tokens %>% 
+  anti_join(stop_words)
+
+# Get counts again
+hp_nonstop_counts <- hp_nonstop_words %>% 
+  count(chapter, word)
+```
+
+```{r}
+# Find the top 5 words from each chapter
+hp_top5_words <- hp_nonstop_counts %>% 
+  group_by(chapter) %>% 
+  arrange(-n) %>% 
+  slice(1:5)
+
+ggplot(data = hp_top5_words, aes(x = word, y = n)) +
+  geom_col(fill = "maroon") +
+  facet_wrap(~chapter, scales = "free") +
+  coord_flip() +
+  labs(x = "Top Words", y = "Word Count", title = "Top 5 Words Used in Each Chapter", subtitle = "Text: Harry Potter and the Sorcerer's Stone") +
+  theme(text = element_text(size=8))
+```
+
+
+**Figure 1:** The top 5 words used in each chapter of *Harry Potter and the Sorcerer's Stone* by J.K. Rowling can reveal a lot about what occurs in each chapter. For instance, in chapter four the words 'hagrid' and 'yeh' are used a lot. This is because in that chapter Harry, the main character, meets Hagrid for the first time and Hagrid talks with an accent that often includes the phrase 'yeh'.
+
+```{r}
+# Make a word cloud for ch. 7 (ie. the chapter where Harry get's sorted into Gryffindor)
+ch7_top100 <- hp_nonstop_counts %>% 
+  filter(chapter == "7") %>% 
+  arrange(-n) %>% 
+  slice(1:100)
+```
+
+```{r}
+ch7_cloud <- ggplot(data = ch7_top100, aes(label = word)) +
+  geom_text_wordcloud(aes(color = n, size = n), shape = "diamond") +
+  scale_size_area(max_size = 6) +
+  scale_color_gradientn(colors = c("burlywood3", "goldenrod1","gold","maroon")) +
+  theme_dark() +
+  labs(title = "Word Cloud for Chapter 7", subtitle = "Text: Harry Potter and the Sorcerer's Stone")
+
+ch7_cloud
+```
+
+
+**Figure 2:** A word cloud of chapter 7 can reveal a lot about that chapter specifically. In this chapter, the word "hat" and "percy" are used a lot. This makes sense becasue in this chapter, Harry meets Percy and is also sorted into Gryffindor by the sorting hat. The other house names are also referenced many times in this chapter.
+
+
+## Part 2: Sentiment Analyis
+
+```{r, include = FALSE}
+# get afinn lexicon
+get_sentiments(lexicon = "afinn")
+```
+
+```{r}
+# Bring hp test and afinn lexicon together
+hp_afinn <- hp_nonstop_words %>% 
+  inner_join(get_sentiments("afinn"))
+
+# Find counts based on snetiment rnaking from afinn lexicon
+hp_afinn_counts <- hp_afinn %>% 
+  count(chapter, value)
+
+# Find the mean afinn score by chapter
+hp_afinn_means <- hp_afinn %>% 
+  group_by(chapter) %>% 
+  summarize(mean_afinn = mean(value))
+```
+
+```{r}
+# Plot the hp afinn ranking (mean of each chapter)
+ggplot(data = hp_afinn_means,
+       aes(x = fct_rev(as.factor(chapter)),
+           y = mean_afinn)) +
+  geom_col(fill="maroon") +
+  coord_flip() +
+  labs(x = "Afinn Mean Score", y = "Chapter", title = "Mean Afinn Score of Each Chapter in Harry Potter and the Sorcerer's Stone") +
+  theme_bw()
+```
+
+
+**Figure 3:** Using the Afinn lexicon for a sentiment analysis reveals how negative or positive text can be. Words are rated from 1-3 (most negative) to 3 (most positive). By taking the average Afinn scores of each chapter, we can see how relatively negative or positive the text is. *Harry Potter and the Sorcerer's Stone* is an adventurous book with a lot of ups and downs and fearful happenings so we see that on average the text appears to be relatively negative but not beyond -1 on average, meaning it's not horribly scary, negative, sad, etc.
+
+
+
+
