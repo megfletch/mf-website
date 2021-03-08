@@ -1,0 +1,41 @@
+---
+title: "Santa Barbara Wind Turbine GIS Report"
+description: |
+  A short description of the post.
+author:
+  - name: Meghan Fletcher
+    url: {}
+date: 03-07-2021
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+
+During Winter Quarter 2021, I took ESM 263 - Geographic Information Systems (GIS) to improve on my knowledge of spatial analysis. One of our assignments involved utilizing the graphical modeler in QGIS to build the framework for a final map. Using this analysis, the goal was to find the 10 most suitable areas in Santa Barbara County to place wind turbines. The suitability of these sites was based on the following criteria:
+
+
+**Wind:** Sites must have sufficient wind power density.
+
+**Roads:** Sites must be within 7.5 km of a major road.
+
+**Airports:** Sites cannot be within 7.5 km of an airport.
+
+**Urban:** Sites cannot be within 1 mile of an existing urban area.
+
+**Fire:** Sites cannot be within fire hazard zones.
+
+**Public:** Sites cannot be on public land.
+  
+
+Further details regarding the analyis performed within the grpahical modeler can be found at: https://ucsb-bren.github.io/ESM263-2021/assignments/03/
+
+
+![Map result produced via QGIS proceeding analysis performed using the graphical modeler](SB_turbines.jpg)
+
+
+
+
+
+
+
