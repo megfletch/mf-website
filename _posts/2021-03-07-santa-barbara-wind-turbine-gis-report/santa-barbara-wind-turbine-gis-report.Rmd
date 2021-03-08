@@ -28,7 +28,7 @@ During Winter Quarter 2021, I took ESM 263 - Geographic Information Systems (GIS
 **Public:** Sites cannot be on public land.
   
 
-Further details regarding the analyis performed within the grpahical modeler can be found at: https://ucsb-bren.github.io/ESM263-2021/assignments/03/
+Further details regarding the analysis performed within the graphical modeler can be found at: https://ucsb-bren.github.io/ESM263-2021/assignments/03/
 
 
 ![Map result produced via QGIS proceeding analysis performed using the graphical modeler](SB_turbines.jpg)
