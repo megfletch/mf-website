@@ -1,0 +1,86 @@
+---
+title: "Cetacean Richness Rasterization Report"
+description: |
+  Exploring the cetacean species richness along the Southern Coast of California
+author:
+  - name: Meghan Fletcher
+    url: {}
+date: 02-19-2021
+output:
+  distill::distill_article:
+    self_contained: false
+    code_folding: hide
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+library(raster)
+library(tidyverse)
+library(here)
+library(sf)
+library(fasterize)
+library(rnaturalearthdata)
+library(rgeos)
+```
+
+
+**Overview:** Using the raster package in R and data from the Kaschner et al. (2016) AquaMaps (www.aquamaps.org), I was able to perform a rasterization that incorporated the different cetacean species that inhabit the waters along the California coastline. In order to develop the final rasterization, I used a probability threshold value of 0.6 meaning that if the probability that a specific cetacean was present was greater than 60%, they were assumed to be "present" and given a value of 1. Conversely, those below the threshold of 0.6 were assumed to be missing from the area and given a score of 0. This allowed me to create a rasterized map of species richness along the coast of California.
+
+```{r}
+# Read in the data
+cetaceans_file <- list.files(path = here("ca_cetaceans"),
+                             pattern = ".tif",
+                             full.names = TRUE)
+
+cetaceans_stack <- raster::stack(cetaceans_file)
+# plot(cetaceans_stack)
+```
+
+```{r}
+# Find cetacean density along CA coast
+is_cetaceans <- function(x, thresh = .6) {
+  y <- ifelse(x >= thresh, 1, 0)
+  return(y)
+}
+
+cetaceans <- calc(cetaceans_stack, fun = is_cetaceans)
+plot(cetaceans)
+```
+
+**Figure 1:** The graphs above represent the rasterized species richness of each individual species along the coast of California using a threshold value of 0.6 as decsribe above (Data: Kaschner et al. 2016).
+
+
+```{r}
+#cetaceans_stack_df <- raster::rasterToPoints(cetaceans_stack) %>% 
+#  as.data.frame() %>% 
+#  mutate_all(~replace(.,is.na(.), 0))
+
+# create data from of total species counts for species presence > 0.6
+ca_cetaceans_df <- raster::rasterToPoints(cetaceans) %>% 
+  as.data.frame() %>% 
+  mutate_all(~replace(.,is.na(.), 0)) 
+
+ca_cetaceans_df$cetacean_richness <- rowSums(ca_cetaceans_df[,3:37], na.rm = TRUE)
+```
+
+
+```{r}
+# bring in coastline form rnatural earth package
+ca_coastline <- rnaturalearth::ne_countries(scale = 'medium', returnclass = "sf")
+```
+
+
+```{r}
+ggplot() +
+  geom_raster(data = ca_cetaceans_df, aes(x=x, y=y, fill = cetacean_richness)) +
+  scale_fill_gradientn(name = "Species Richness", colors = c("lightgrey", "orchid2", "navy")) +
+  geom_sf(data = ca_coastline, fill = "lightgreen") +
+  coord_sf(expand = FALSE, xlim = c(-125, -115), ylim = c(32, 38)) +
+  labs(x = "Longitude", y = "Latitutde", title = "Cetacean Species Richness Mapping Along the Coast of California", subtitle = "Data: Kaschner et al. (2016)")
+```
+
+**Figure 2** This rasterization provides a clear visualization of the cetacean species richness along the coast of California. The darkest locations along the coast represent the areas with the most cetaceans are present given dhe data (Data: Kaschner et al. 2016).
+
+
