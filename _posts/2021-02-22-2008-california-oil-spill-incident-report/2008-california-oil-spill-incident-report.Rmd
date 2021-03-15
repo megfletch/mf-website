@@ -1,7 +1,7 @@
 ---
 title: "2008 California Oil Spill Incident Report"
 description: |
-  A short description of the post.
+  A look into where these incidents occurred across California
 author:
   - name: Meghan Fletcher
     url: {}
